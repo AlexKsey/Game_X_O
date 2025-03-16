@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Крестики-нолики</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 5px;
+            justify-content: center;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 1px solid #ccc;
+        }
+        .cell.taken {
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>Крестики-нолики</h1>
+    <div class="board" id="board"></div>
+    <p id="winner"></p>
+    <script>
+        const board = document.getElementById('board');
+        const winnerText = document.getElementById('winner');
+        let currentPlayer = 'X';
+        let gameActive = true;
+
+        const cells = Array(9).fill(null);
+
+        function checkWinner() {
+            const winningCombos = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // горизонталь
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // вертикаль
+                [0, 4, 8], [2, 4, 6]            // диагональ
+            ];
+
+            for (const combo of winningCombos) {
+                const [a, b, c] = combo;
+                if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
+                    return cells[a];
+                }
+            }
+
+            return cells.includes(null) ? null : 'Ничья';
+        }
+
+        function handleCellClick(index) {
+            if (!gameActive || cells[index]) return;
+
+            cells[index] = currentPlayer;
+            const cell = document.getElementById(`cell-${index}`);
+            cell.textContent = currentPlayer;
+            cell.classList.add('taken');
+
+            const winner = checkWinner();
+            if (winner) {
+                winnerText.textContent = winner === 'Ничья' ? 'Ничья!' : `Победитель: ${winner}`;
+                gameActive = false;
+                return;
+            }
+
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        }
+
+        function createBoard() {
+            board.innerHTML = '';
+            cells.forEach((_, index) => {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.id = `cell-${index}`;
+                cell.addEventListener('click', () => handleCellClick(index));
+                board.appendChild(cell);
+            });
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>
